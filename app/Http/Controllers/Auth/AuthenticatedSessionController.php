@@ -3,50 +3,74 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Show the login page.
      */
-    public function create(): Response
+    public function create()
     {
-        return Inertia::render('Auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
-        ]);
+        return Inertia::render('Auth/Login');
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Handle login and redirect by role.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+    public function store(Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+    if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
+    $request->session()->regenerate();
+
+    // 🔥 L-ISLA7 HNA: Kheddem Spatie bach t-jib smiyt le role
+    $user = Auth::user();
+    
+    if ($user->hasRole('admin')) {
+        return redirect()->intended(route('admin.dashboard'));
+    } elseif ($user->hasRole('agence')) {
+        return redirect()->intended(route('agence.dashboard'));
+    } elseif ($user->hasRole('client')) {
+        return redirect()->intended(route('client.dashboard'));
+    }
+
+    // Ila mal9a 3ndou walo
+    return $this->invalidRole();
+}
     /**
-     * Destroy an authenticated session.
+     * Log the user out.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
+        Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
+    }
+
+    /**
+     * Handle unknown/missing role.
+     */
+    private function invalidRole()
+    {
+        Auth::logout();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Your account does not have a valid role. Contact support.',
+        ]);
     }
 }
