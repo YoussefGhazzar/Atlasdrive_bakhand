@@ -16,7 +16,9 @@ class AgenceController extends Controller
     public function index()
     {
        // return Inertia::render('Dashboard/AgenceDashboard');
-        return Inertia::render('Dashboard/AgenceDashboard');
+        return Inertia::render('Dashboard/Agency/Overview', [
+            'agency' => auth()->user()->agency ?? auth()->user(),
+        ]);
     }
 
     /**
@@ -84,6 +86,80 @@ class AgenceController extends Controller
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+
+ private function agencyData()
+    {
+        $user   = auth()->user();
+        $agency = $user->agency ?? $user;
+        return $agency;
+    }
+ 
+    // GET /agence/dashboard  → Pages/Dashboard/Agency/Overview.vue
+    public function overview()
+    {
+        return Inertia::render('Dashboard/Agency/Overview', [
+            'agency'         => $this->agencyData(),
+            'stats'          => [],
+            'recentBookings' => [],
+        ]);
+    }
+ 
+    // GET /agence/fleet  → Pages/Dashboard/Agency/Fleet.vue
+    public function fleet()
+    {
+        return Inertia::render('Dashboard/Agency/Fleet', [
+            'agency' => $this->agencyData(),
+            'fleet'  => [],
+        ]);
+    }
+ 
+    // GET /agence/bookings  → Pages/Dashboard/Agency/Bookings.vue
+    public function bookings()
+    {
+        return Inertia::render('Dashboard/Agency/Bookings', [
+            'agency'   => $this->agencyData(),
+            'bookings' => [],
+        ]);
+    }
+ 
+    // GET /agence/earnings  → Pages/Dashboard/Agency/Earnings.vue
+    public function earnings()
+    {
+        return Inertia::render('Dashboard/Agency/Earnings', [
+            'agency'            => $this->agencyData(),
+            'earningCards'      => [],
+            'revenueByCategory' => [],
+        ]);
+    }
+ 
+    // GET /agence/settings  → Pages/Dashboard/Agency/Settings.vue
+    public function settings()
+    {
+        return Inertia::render('Dashboard/Agency/Settings', [
+            'agency' => $this->agencyData(),
+        ]);
+    }
+ 
+    // PATCH /agence/settings
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'name'    => ['required', 'string', 'max:150'],
+            'email'   => ['nullable', 'email'],
+            'phone'   => ['nullable', 'string', 'max:20'],
+            'city'    => ['nullable', 'string', 'max:100'],
+            'address' => ['nullable', 'string', 'max:200'],
+        ]);
+ 
+        auth()->user()->agency?->update(
+            $request->only('name', 'email', 'phone', 'city', 'address')
+        );
+ 
+        return back()->with('success', 'Settings saved.');
+    }
+
+
+
     /**
      * Display the specified resource.
      */

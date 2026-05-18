@@ -52,6 +52,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Log the user out.
      */
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -59,7 +60,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('Auth/login');
     }
 
     /**
@@ -69,7 +70,7 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::logout();
 
-        return redirect()->route('login')->withErrors([
+        return redirect()->route('Auth/login')->withErrors([
             'email' => 'Your account does not have a valid role. Contact support.',
         ]);
     }

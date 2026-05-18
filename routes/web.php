@@ -17,12 +17,12 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('Auth/login');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
-Route::post('/logout', [AuthenticatedSessionController::class, 'logout'])
+Route::get('/logout', [AuthenticatedSessionController::class, 'logout'])
     ->middleware('auth')
-    ->name('logout');
+    ->name('Auth/logout');
 
 Route::get('/register/client', [RegisteredUserController::class, 'client'])
     ->middleware('guest')
@@ -55,6 +55,14 @@ Route::middleware(['auth', 'role:agence'])->group(function () {
     Route::get('/agency/select-plan', fn () => Inertia::render('pricing'))->name('agency.select-plan');
     Route::get('/agency/payment', [PaymentController::class, 'create'])->name('agency.payment');
     Route::post('/agency/payment', [PaymentController::class, 'store'])->name('agency.payment.store');
+
+ Route::get('/agence/dashboard',  [AgenceController::class, 'overview']      )->name('agency.dashboard');
+    Route::get('/agence/overview',   [AgenceController::class, 'overview']      )->name('agency.overview');
+    Route::get('/agency/fleet',      [AgenceController::class, 'fleet']    )->name('agency.fleet');
+    Route::get('/agency/bookings',   [AgenceController::class, 'bookings'] )->name('agency.bookings');
+    Route::get('/agency/earnings',   [AgenceController::class, 'earnings'] )->name('agency.earnings');
+    Route::get('/agency/settings',   [AgenceController::class, 'settings'] )->name('agency.settings');
+    Route::patch('/agency/settings', [AgenceController::class, 'updateSettings'])->name('agency.settings.update');
 });
 
 Route::middleware('auth')->group(function () {

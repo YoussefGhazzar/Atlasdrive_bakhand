@@ -1,5 +1,5 @@
 <template>
-  <DashboardLayout title="My Bookings" subtitle="All your reservations" :client="client">
+  <DashbordClient title="My Bookings" subtitle="All your reservations" :client="client">
 
     <!-- Filter tabs -->
     <div class="flex gap-2 mb-5 flex-wrap">
@@ -89,12 +89,12 @@
       </div>
     </div>
 
-  </DashboardLayout>
+  </DashbordClient>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import DashboardLayout from '@/Layouts/DashboardClient.vue'
+import DashbordClient from '@/Layouts/DashbordClient.vue'
 
 const props = defineProps({
   client:   { type: Object, required: true },

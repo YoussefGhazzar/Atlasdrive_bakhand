@@ -1,5 +1,5 @@
 <template>
-  <DashboardLayout title="Active Rental" subtitle="Your current rental" :client="client">
+  <DashbordClient title="Active Rental" subtitle="Your current rental" :client="client">
 
     <!-- Active rental exists -->
     <div v-if="activeRental" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -109,13 +109,13 @@
       </Link>
     </div>
 
-  </DashboardLayout>
+  </DashbordClient>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import DashboardLayout from '@/Layouts/DashboardClient.vue'
+import DashbordClient from '@/Layouts/DashbordClient.vue'
 
 defineProps({
   client:       { type: Object, required: true },
