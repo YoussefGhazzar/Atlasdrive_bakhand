@@ -20,7 +20,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('Auth/login');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
-Route::get('/logout', [AuthenticatedSessionController::class, 'logout'])
+Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('Auth/logout');
 

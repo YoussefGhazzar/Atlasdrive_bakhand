@@ -41,7 +41,7 @@ class AuthenticatedSessionController extends Controller
     if ($user->hasRole('admin')) {
         return redirect()->intended(route('admin.dashboard'));
     } elseif ($user->hasRole('agence')) {
-        return redirect()->intended(route('agence.dashboard'));
+        return redirect()->intended(route('agency.dashboard'));
     } elseif ($user->hasRole('client')) {
         return redirect()->intended(route('client.dashboard'));
     }
@@ -53,14 +53,14 @@ class AuthenticatedSessionController extends Controller
      * Log the user out.
      */
 
-    public function logout(Request $request)
+    public function destroy(Request $request)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('Auth/login');
+        return redirect()->route('login');
     }
 
     /**
