@@ -102,7 +102,7 @@
         <circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
       </svg>
       <p class="text-slate-400 font-semibold mt-4">No active rental right now</p>
-      <Link :href="route('fleet')"
+      <Link :href="route('client.bookings')"
         class="mt-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl no-underline transition-colors"
         style="font-family:'Sora',sans-serif;">
         Browse Fleet
