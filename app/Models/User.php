@@ -16,7 +16,6 @@ class User extends Authenticatable
     protected $fillable = [
         'nom',
         'prenom',
-        'role_id',
         'email',
         'telephone',
         'addresse',
@@ -37,9 +36,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function agences()
+    public function agence()
     {
-        return $this->hasOne(Agence::class);
+        return $this->hasOne(Agence::class, 'user_id');
     }
     
     public function reservations()
