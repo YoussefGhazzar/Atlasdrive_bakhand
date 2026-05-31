@@ -39,9 +39,7 @@ Route::post('/register/agency', [RegisteredUserController::class, 'registerAgenc
     ->name('agency.register.store');
 
 
-Route::get('/dashboard/admin', [AdminController::class, 'index'])
-    ->middleware(['auth', 'role:admin'])
-    ->name('admin.dashboard');
+
 Route::middleware(['auth', 'role:client'])->group(function () {
     Route::get('/client/dashboard', [ClientController::class, 'index']   )->name('client.dashboard');
     Route::get('/client/bookings',  [ClientController::class, 'bookings'])->name('client.bookings');
@@ -64,6 +62,16 @@ Route::middleware(['auth', 'role:agence'])->group(function () {
     Route::get('/agency/settings',   [AgenceController::class, 'settings'] )->name('agency.settings');
     Route::patch('/agency/settings', [AgenceController::class, 'updateSettings'])->name('agency.settings.update');
 });
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard',  [AdminController::class, 'overview'] )->name('admin.dashboard');
+    Route::get('/admin/overview',   [AdminController::class, 'overview'] )->name('admin.overview');
+    Route::get('/admin/agencies',   [AdminController::class, 'agencies'] )->name('admin.agencies');
+    Route::get('/admin/users',      [AdminController::class, 'users']    )->name('admin.users');
+    Route::get('/admin/bookings',   [AdminController::class, 'bookings'] )->name('admin.bookings');
+    Route::get('/admin/reports',    [AdminController::class, 'reports']  )->name('admin.reports');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
