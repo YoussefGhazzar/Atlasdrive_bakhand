@@ -21,7 +21,7 @@
       <table class="w-full">
         <thead class="bg-slate-50">
           <tr>
-            <th v-for="h in ['Vehicle','Category','Price/day','Status','Bookings','Actions']" :key="h"
+            <th v-for="h in ['Vehicle','marque','Category','prix_par_jour','Status','Bookings','Actions']" :key="h"
               class="text-left text-xs font-bold text-slate-400 uppercase tracking-widest px-5 py-3">{{ h }}</th>
           </tr>
         </thead>
@@ -37,15 +37,16 @@
                 </div>
               </div>
             </td>
+            <td class="px-5 py-3 text-lg  text-slate-800 ">{{ car.marque }}</td>
             <td class="px-5 py-3">
               <span class="text-xs font-semibold text-teal-600 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded-full">
                 {{ car.category }}
               </span>
             </td>
-            <td class="px-5 py-3 text-sm font-bold text-slate-700">${{ car.pricePerDay }}</td>
+            <td class="px-5 py-3 text-sm font-bold text-slate-700">{{ car.prix_par_jour }}DH</td>
             <td class="px-5 py-3">
-              <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', car.available ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-600']">
-                {{ car.available ? 'Available' : 'Rented' }}
+              <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', car.status === 'Available' ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-600']">
+                {{ car.status }}
               </span>
             </td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ car.totalBookings }}</td>
