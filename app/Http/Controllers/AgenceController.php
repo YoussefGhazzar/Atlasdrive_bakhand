@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Agence;
 use App\Models\User;
+use App\Models\voiture;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -107,9 +109,31 @@ class AgenceController extends Controller
     // GET /agence/fleet  → Pages/Dashboard/Agency/Fleet.vue
     public function fleet()
     {
+        $user = Auth::user();
+        $agencyid = $user->agence?->id;
+        $fleet = [];
+        if($agencyid){
+            $fleet= voiture::where('agency_id', $agencyid)->with('category')->orderBy('created_at', 'desc')
+            ->get()
+            ->map(fn($voiture) => [
+                'id'              => $voiture->id,
+                'marque'          => $voiture->marque,
+                'modele'          => $voiture->modele,
+                'annee'           => $voiture->annee,
+                'couleur'         => $voiture->couleur,
+                'prix_par_jour' => $voiture->prix_par_jour,
+                'status'=> $voiture->disponible ? 'Available' : 'Rented', 
+                'category' => $voiture->category?->name ?? 'standard',
+                'image' => $voiture->image ? asset(str_replace('storage/storage/', 'storage/', $voiture->image)) : '/images/default-car.png',
+                'rating' => 4.8,
+                
+                ]);
+        }
+
+        
         return Inertia::render('Dashboard/Agency/Fleet', [
             'agency' => $this->agencyData(),
-            'fleet'  => [],
+            'fleet'  => $fleet,
         ]);
     }
  
