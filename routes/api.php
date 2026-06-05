@@ -19,6 +19,7 @@ use App\Http\Controllers\ProfileController as ControllersProfileController;
 | Public Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/',[]);
 
 Route::get('/plans', [AuthController::class, 'plans']);
 
