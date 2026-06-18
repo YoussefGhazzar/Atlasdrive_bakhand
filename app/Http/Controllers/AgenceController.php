@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Category;
+use App\Models\Reservation;
+
 
 class AgenceController extends Controller
 {
@@ -106,37 +110,133 @@ class AgenceController extends Controller
         ]);
     }
  
-    // GET /agence/fleet  → Pages/Dashboard/Agency/Fleet.vue
-    public function fleet()
-    {
-        $user = Auth::user();
-        $agencyid = $user->agence?->id;
-        $fleet = [];
-        if($agencyid){
-            $fleet= voiture::where('agency_id', $agencyid)->with('category')->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn($voiture) => [
-                'id'              => $voiture->id,
-                'marque'          => $voiture->marque,
-                'modele'          => $voiture->modele,
-                'annee'           => $voiture->annee,
-                'couleur'         => $voiture->couleur,
-                'prix_par_jour' => $voiture->prix_par_jour,
-                'status'=> $voiture->disponible ? 'Available' : 'Rented', 
-                'category' => $voiture->category?->name ?? 'standard',
-                'image' => $voiture->image ? asset(str_replace('storage/storage/', 'storage/', $voiture->image)) : '/images/default-car.png',
-                'rating' => 4.8,
-                
-                ]);
-        }
-
-        
-        return Inertia::render('Dashboard/Agency/Fleet', [
-            'agency' => $this->agencyData(),
-            'fleet'  => $fleet,
+ public function fleet()
+{
+    $agency = auth()->user()->agence;
+ 
+    $fleet = Voiture::where('agency_id', $agency->id)
+        ->with('category')
+        ->latest()
+        ->get()
+        ->map(fn($v) => [
+            'id'              => $v->id,
+            'marque'          => $v->marque,
+            'modele'          => $v->modele,
+            'annee'           => $v->annee,
+            'immatriculation' => $v->immatriculation,
+            'prix_par_jour'   => $v->prix_par_jour,
+            'nb_places'       => $v->nb_places,
+            'transmission'    => $v->transmission,
+            'carburant'       => $v->carburant,
+            'couleur'         => $v->couleur,
+            'disponible'      => $v->disponible,
+            'category'        => $v->category,
+            
+            'image'           => $v->image 
+                ? asset('/' . ltrim($v->image, '/')) 
+                : '/images/default-car.png',
         ]);
+ 
+    $categories = Category::select('id', 'name')->get();
+ 
+    return Inertia::render('Dashboard/Agency/Fleet', [
+        'agency'     => $agency,
+        'fleet'      => $fleet, // Safi daba 'fleet' fiha les URLs s-s7a7
+        'categories' => $categories,
+    ]);
+}
+ 
+// POST /agence/fleet
+public function storeFleet(Request $request)
+{
+    $validated = $request->validate([
+        'marque'          => ['required', 'string', 'max:50'],
+        'modele'          => ['required', 'string', 'max:50'],
+        'annee'           => ['required', 'integer', 'min:1990', 'max:' . (date('Y') + 1)],
+        'immatriculation' => ['required', 'string', 'max:20', 'unique:voitures,immatriculation'],
+        'category_id'     => ['required', 'exists:categories,id'],
+        'prix_par_jour'   => ['required', 'numeric', 'min:0'],
+        'nb_places'       => ['nullable', 'integer', 'min:1', 'max:9'],
+        'transmission'    => ['required', 'in:manuelle,automatique'],
+        'carburant'       => ['required', 'in:essence,diesel,electrique,hybride'],
+        'couleur'         => ['nullable', 'string', 'max:30'],
+        'image'           => ['nullable', 'image', 'max:4096'],
+        'disponible'      => ['nullable'],
+    ]);
+ 
+    // Build the insert array explicitly — no $request->except()
+    $data = [
+        'agency_id'       => auth()->user()->agence->id,
+        'marque'          => $validated['marque'],
+        'modele'          => $validated['modele'],
+        'annee'           => $validated['annee'],
+        'immatriculation' => $validated['immatriculation'],
+        'category_id'     => $validated['category_id'],
+        'prix_par_jour'   => $validated['prix_par_jour'],
+        'nb_places'       => $validated['nb_places'] ?? 5,
+        'transmission'    => $validated['transmission'],
+        'carburant'       => $validated['carburant'],
+        'couleur'         => $validated['couleur'] ?? null,
+        'disponible'      => $request->boolean('disponible'),
+    ];
+ 
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('images', 'public');
     }
  
+    Voiture::create($data);
+ 
+    return back()->with('success', 'Vehicle added successfully.');
+}
+ 
+// PUT /agence/fleet/{voiture}
+public function updateFleet(Request $request, Voiture $voiture)
+{
+    // Ensure the vehicle belongs to the logged-in agency
+    abort_unless($voiture->agency_id === auth()->user()->agence->id, 403);
+ 
+    $request->validate([
+        'marque'          => ['required', 'string', 'max:50'],
+        'modele'          => ['required', 'string', 'max:50'],
+        'annee'           => ['required', 'integer', 'min:1990', 'max:' . (date('Y') + 1)],
+        'immatriculation' => ['required', 'string', 'max:20', 'unique:voitures,immatriculation,' . $voiture->id],
+        'category_id'     => ['required', 'exists:categories,id'],
+        'prix_par_jour'   => ['required', 'numeric', 'min:0'],
+        'nb_places'       => ['nullable', 'integer', 'min:1', 'max:9'],
+        'transmission'    => ['required', 'in:manuelle,automatique'],
+        'carburant'       => ['required', 'in:essence,diesel,electrique,hybride'],
+        'couleur'         => ['nullable', 'string', 'max:30'],
+        'image'           => ['nullable', 'image', 'max:4096'],
+        'disponible'      => ['boolean'],
+    ]);
+ 
+    $data = $request->except('image');
+ 
+    if ($request->hasFile('image')) {
+        if ($voiture->image) {
+            Storage::disk('public')->delete($voiture->image);
+        }
+        $data['image'] = $request->file('image')->store('images', 'public');
+    }
+ 
+    $voiture->update($data);
+ 
+    return back()->with('success', 'Vehicle updated successfully.');
+}
+ 
+// DELETE /agence/fleet/{voiture}
+public function destroyFleet(Voiture $voiture)
+{
+    abort_unless($voiture->agency_id === auth()->user()->agence->id, 403);
+ 
+    if ($voiture->image) {
+        Storage::disk('public')->delete($voiture->image);
+    }
+ 
+    $voiture->delete();
+ 
+    return back()->with('success', 'Vehicle removed.');
+}
     // GET /agence/bookings  → Pages/Dashboard/Agency/Bookings.vue
     public function bookings()
     {
@@ -175,7 +275,7 @@ class AgenceController extends Controller
             'address' => ['nullable', 'string', 'max:200'],
         ]);
  
-        auth()->user()->agency?->update(
+        auth()->user()->agence?->update(
             $request->only('name', 'email', 'phone', 'city', 'address')
         );
  

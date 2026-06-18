@@ -12,6 +12,7 @@ class voiture extends Model
         'marque',
         'modele',
         'annee',
+        'immatriculation',
         'couleur',
         'image',
         'prix_par_jour',
