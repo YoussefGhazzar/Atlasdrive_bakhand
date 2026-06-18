@@ -23,6 +23,7 @@
       <table class="w-full">
         <thead class="bg-slate-50">
           <tr>
+            <th v-for="h in ['Vehicle','marque','modele','Category','prix_par_jour','Status','Bookings','Actions']" :key="h"
             <th v-for="h in ['Vehicle','Category','Price/day','Status','Bookings','Actions']" :key="h"
               class="text-left text-xs font-bold text-slate-400 uppercase tracking-widest px-5 py-3">{{ h }}</th>
           </tr>
@@ -32,6 +33,7 @@
             class="border-t border-slate-50 hover:bg-slate-50 transition-colors">
             <td class="px-5 py-3">
               <div class="flex items-center gap-3">
+                <img :src="car.image" :alt="car.name" class="w-20 h-12 object-cover rounded-lg flex-shrink-0"/>
                 <img :src="car.image || placeholderImg" :alt="car.marque" class="w-12 h-9 object-cover rounded-lg flex-shrink-0"/>
                 <div>
                   <p class="text-sm font-bold text-slate-800">{{ car.marque }} {{ car.modele }}</p>
@@ -39,6 +41,8 @@
                 </div>
               </div>
             </td>
+            <td class="px-5 py-3 text-base  text-slate-800 ">{{ car.marque }}</td>
+            <td class="px-5 py-3 text-base  text-slate-800 ">{{ car.modele }}</td>
             <td class="px-5 py-3">
               <span class="text-xs font-semibold text-teal-600 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded-full">
                 {{ car.category?.name ?? '—' }}
@@ -264,6 +268,7 @@ const fleetSearch = ref('')
 const filteredFleet = computed(() => {
   const q = fleetSearch.value.toLowerCase()
   return props.fleet.filter(c =>
+    !q || c.marque.toLowerCase().includes(q) || c.modele.toLowerCase().includes(q)
     !q || `${c.marque} ${c.modele}`.toLowerCase().includes(q) || c.category?.name?.toLowerCase().includes(q)
   )
 })
