@@ -55,4 +55,5 @@ class Reservation extends Model
     public function user()    { return $this->belongsTo(User::class);    }
     public function voiture() { return $this->belongsTo(Voiture::class); }
     public function agency()  { return $this->belongsTo(Agence::class);  }
+    public function category() { return $this->voiture?->category(); }
 }
