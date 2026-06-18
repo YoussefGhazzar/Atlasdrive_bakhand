@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:client'])->group(function () {
     Route::get('/client/dashboard', [ClientController::class, 'index']   )->name('client.dashboard');
     Route::get('/client/bookings',  [ClientController::class, 'bookings'])->name('client.bookings');
     Route::get('/client/active',    [ClientController::class, 'active']  )->name('client.active');
-
+    Route::get('/client/fleet',     [ClientController::class, 'fleet']   )->name('client.fleet');
 });
 
 Route::middleware(['auth', 'role:agence'])->group(function () {
@@ -56,8 +56,10 @@ Route::middleware(['auth', 'role:agence'])->group(function () {
 
  Route::get('/agence/dashboard',  [AgenceController::class, 'overview']      )->name('agency.dashboard');
     Route::get('/agence/overview',   [AgenceController::class, 'overview']      )->name('agency.overview');
-    Route::get('/agency/fleet',      [AgenceController::class, 'fleet']    )->name('agency.fleet');
-    Route::get('/agency/bookings',   [AgenceController::class, 'bookings'] )->name('agency.bookings');
+     Route::get('/agence/fleet',           [AgenceController::class, 'fleet']       )->name('agence.fleet');
+     Route::post('/agence/fleet',          [AgenceController::class, 'storeFleet']  )->name('agence.fleet.store');
+     Route::put('/agence/fleet/{voiture}', [AgenceController::class, 'updateFleet'] )->name('agence.fleet.update');
+     Route::delete('/agence/fleet/{voiture}', [AgenceController::class, 'destroyFleet'])->name('agence.fleet.destroy');    Route::get('/agency/bookings',   [AgenceController::class, 'bookings'] )->name('agency.bookings');
     Route::get('/agency/earnings',   [AgenceController::class, 'earnings'] )->name('agency.earnings');
     Route::get('/agency/settings',   [AgenceController::class, 'settings'] )->name('agency.settings');
     Route::patch('/agency/settings', [AgenceController::class, 'updateSettings'])->name('agency.settings.update');
