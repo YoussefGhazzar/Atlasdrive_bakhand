@@ -59,8 +59,8 @@
           <div class="bg-white rounded-xl p-4 mb-3 border border-slate-200 shadow-sm">
             <h3 class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-3">Price per day</h3>
             <div class="flex justify-between mb-2">
-              <span class="text-xs font-bold text-teal-600">${{ priceRange[0] }}</span>
-              <span class="text-xs font-bold text-teal-600">${{ priceRange[1] }}</span>
+              <span class="text-xs font-bold text-teal-600">{{ priceRange[0] }}DH</span>
+              <span class="text-xs font-bold text-teal-600">{{ priceRange[1] }}DH</span>
             </div>
             <input type="range" min="20" max="600" v-model="priceRange[1]"
               class="w-full accent-teal-600 mb-3"/>
@@ -258,7 +258,7 @@
                 <!-- Price + Book -->
                 <div class="flex items-center justify-between mt-auto pt-3.5 border-t border-slate-100">
                   <div>
-                    <span class="text-2xl font-extrabold text-slate-900">${{ car.pricePerDay }}</span>
+                    <span class="text-2xl font-extrabold text-slate-900">{{ car.pricePerDay }}DH</span>
                     <span class="text-xs text-slate-400 ml-0.5">/day</span>
                   </div>
                   <Link v-if="car.available" :href="`/cars/${car.id}`"
@@ -334,10 +334,10 @@
               <div class="flex sm:flex-col items-center sm:items-end justify-between p-5 border-t sm:border-t-0 sm:border-l border-slate-100 sm:min-w-[150px]">
                 <div class="text-right">
                   <div>
-                    <span class="text-2xl sm:text-[1.75rem] font-extrabold text-slate-900">${{ car.pricePerDay }}</span>
+                    <span class="text-2xl sm:text-[1.75rem] font-extrabold text-slate-900">{{ car.pricePerDay }}DH</span>
                     <span class="text-xs text-slate-400">/day</span>
                   </div>
-                  <p class="text-[0.72rem] text-slate-400 mt-0.5">${{ car.pricePerDay * 7 }}/week</p>
+                  <p class="text-[0.72rem] text-slate-400 mt-0.5">{{ car.pricePerDay * 7 }}DH/week</p>
                 </div>
                 <Link v-if="car.available" :href="`/cars/${car.id}`"
                   class="sm:w-full sm:mt-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-4 py-2.5 rounded-lg no-underline text-center transition-colors">
