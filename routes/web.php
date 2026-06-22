@@ -8,8 +8,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\FleetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +47,8 @@ Route::middleware(['auth', 'role:client'])->group(function () {
     Route::get('/client/bookings',  [ClientController::class, 'bookings'])->name('client.bookings');
     Route::get('/client/active',    [ClientController::class, 'active']  )->name('client.active');
     Route::get('/client/fleet',     [ClientController::class, 'fleet']   )->name('client.fleet');
+
+   
 });
 
 Route::middleware(['auth', 'role:agence'])->group(function () {
@@ -63,6 +67,8 @@ Route::middleware(['auth', 'role:agence'])->group(function () {
     Route::get('/agency/earnings',   [AgenceController::class, 'earnings'] )->name('agency.earnings');
     Route::get('/agency/settings',   [AgenceController::class, 'settings'] )->name('agency.settings');
     Route::patch('/agency/settings', [AgenceController::class, 'updateSettings'])->name('agency.settings.update');
+    Route::patch('/agence/bookings/{reservation}/status', [AgenceController::class, 'updateBookingStatus'])
+    ->name('agence.bookings.status');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -73,6 +79,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/bookings',   [AdminController::class, 'bookings'] )->name('admin.bookings');
     Route::get('/admin/reports',    [AdminController::class, 'reports']  )->name('admin.reports');
 });
+
+ Route::get('/cars/{voiture}', [ReservationController::class, 'show'])->name('cars.show');
+ 
+// ── Protected: only logged-in clients can SUBMIT a booking ─
+    Route::middleware(['auth', 'role:client'])->group(function () {
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+});
+
+Route::get('/fleet', [FleetController::class, 'index'])->name('fleet');
 
 
 Route::middleware('auth')->group(function () {

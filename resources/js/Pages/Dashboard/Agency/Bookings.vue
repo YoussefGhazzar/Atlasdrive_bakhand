@@ -2,7 +2,7 @@
   <AgencyDashboardLayout title="Bookings" subtitle="All reservations" :agency="agency">
 
     <div class="flex gap-2 mb-5 flex-wrap">
-      <button v-for="f in ['All','Confirmed','Pending','Cancelled']" :key="f"
+      <button v-for="f in ['All','Confirmed','Pending','Active','Completed','Cancelled']" :key="f"
         @click="activeFilter = f"
         :class="[
           'text-xs font-bold px-4 py-2 rounded-xl border-none cursor-pointer transition-all',
@@ -19,7 +19,7 @@
       <table class="w-full">
         <thead class="bg-slate-50">
           <tr>
-            <th v-for="h in ['#','Client','Vehicle','Pick-up','Return','Days','Total','Status']" :key="h"
+            <th v-for="h in ['#','Client','Vehicle','Pick-up','Return','Days','Total','Status','Actions']" :key="h"
               class="text-left text-xs font-bold text-slate-400 uppercase tracking-widest px-5 py-3">{{ h }}</th>
           </tr>
         </thead>
@@ -40,11 +40,53 @@
             <td class="px-5 py-3 text-sm font-semibold text-slate-700">{{ b.days }}d</td>
             <td class="px-5 py-3 text-sm font-bold text-slate-800">${{ b.total }}</td>
             <td class="px-5 py-3">
-              <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', statusClass(b.status)]">{{ b.status }}</span>
+              <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', statusClass(b.status)]">
+                {{ b.status }}
+              </span>
+            </td>
+
+            <!-- ── Actions: status transition buttons ── -->
+            <td class="px-5 py-3">
+              <div class="flex items-center gap-2">
+                <button v-if="b.status === 'Pending'"
+                  @click="changeStatus(b, 'confirmee')"
+                  :disabled="loadingId === b.id"
+                  class="text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-transparent border-none cursor-pointer disabled:opacity-40">
+                  Confirm
+                </button>
+                <button v-if="b.status === 'Pending'"
+                  @click="changeStatus(b, 'annulee')"
+                  :disabled="loadingId === b.id"
+                  class="text-xs font-bold text-red-400 hover:text-red-500 bg-transparent border-none cursor-pointer disabled:opacity-40">
+                  Reject
+                </button>
+
+                <button v-if="b.status === 'Confirmed'"
+                  @click="changeStatus(b, 'active')"
+                  :disabled="loadingId === b.id"
+                  class="text-xs font-bold text-teal-600 hover:text-teal-700 bg-transparent border-none cursor-pointer disabled:opacity-40">
+                  Mark Active
+                </button>
+                <button v-if="b.status === 'Confirmed'"
+                  @click="changeStatus(b, 'annulee')"
+                  :disabled="loadingId === b.id"
+                  class="text-xs font-bold text-red-400 hover:text-red-500 bg-transparent border-none cursor-pointer disabled:opacity-40">
+                  Cancel
+                </button>
+
+                <button v-if="b.status === 'Active'"
+                  @click="changeStatus(b, 'terminee')"
+                  :disabled="loadingId === b.id"
+                  class="text-xs font-bold text-slate-600 hover:text-slate-800 bg-transparent border-none cursor-pointer disabled:opacity-40">
+                  Mark Returned
+                </button>
+
+                <span v-if="loadingId === b.id" class="text-xs text-slate-400">Updating...</span>
+              </div>
             </td>
           </tr>
           <tr v-if="filteredBookings.length === 0">
-            <td colspan="8" class="text-center py-12 text-slate-400 text-sm">No bookings found.</td>
+            <td colspan="9" class="text-center py-12 text-slate-400 text-sm">No bookings found.</td>
           </tr>
         </tbody>
       </table>
@@ -55,6 +97,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import AgencyDashboardLayout from '@/Layouts/Agencydashboard.vue'
 
 const props = defineProps({
@@ -63,6 +106,7 @@ const props = defineProps({
 })
 
 const activeFilter = ref('All')
+const loadingId     = ref(null)
 
 const filteredBookings = computed(() =>
   activeFilter.value === 'All'
@@ -74,8 +118,17 @@ function statusClass(status) {
   switch (status) {
     case 'Confirmed': return 'bg-emerald-50 text-emerald-700'
     case 'Pending':   return 'bg-yellow-50 text-yellow-600'
+    case 'Active':    return 'bg-teal-50 text-teal-700'
+    case 'Completed': return 'bg-slate-100 text-slate-600'
     case 'Cancelled': return 'bg-red-50 text-red-500'
     default:          return 'bg-slate-100 text-slate-500'
   }
+}
+
+function changeStatus(booking, newStatus) {
+  loadingId.value = booking.id
+  router.patch(`/agence/bookings/${booking.id}/status`, { statut: newStatus }, {
+    onFinish: () => { loadingId.value = null },
+  })
 }
 </script>

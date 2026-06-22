@@ -12,4 +12,12 @@ class Agence extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function voitures()
+    {
+        return $this->hasMany(Voiture::class);
+    }
+    public function reservations()
+    {
+        return $this->hasManyThrough(Reservation::class, Voiture::class);
+    }
 }
