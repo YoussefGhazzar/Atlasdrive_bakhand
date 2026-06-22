@@ -11,6 +11,7 @@
         Atlas Drive
       </span>
     </Link>
+    
 
     <!-- Nav Links -->
     <ul class="flex items-center gap-8 list-none m-0 p-0">
@@ -23,6 +24,7 @@
         >
           {{ link.label }}
         </Link>
+        
       </li>
     </ul>
 
@@ -40,11 +42,13 @@
 
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
+import { route } from 'ziggy-js';
 
 const $page = usePage()
 
 const navLinks = [
   { label: 'Home',     route: 'home',     href: '/'          },
+  { label: 'Fleet',    route: 'fleet',    href: '/fleet'     },
  
 ]
 </script>
