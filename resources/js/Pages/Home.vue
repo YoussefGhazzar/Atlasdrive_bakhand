@@ -101,21 +101,7 @@
 
     </section>
 
-    <!-- Footer -->
-    <footer class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center
-                   justify-between border-t border-slate-200 gap-3">
-      <span class="text-xs text-slate-500" style="font-family:'Sora',sans-serif;">
-        Partners: Atlas Drive – Opportunities
-      </span>
-      <div class="flex items-center gap-5 flex-wrap justify-center">
-        <span class="text-sm font-bold text-yellow-400">amazon</span>
-        <span class="text-sm font-bold text-gray-700">🌿 croncat</span>
-        <span class="text-sm font-bold text-gray-700">✦ Atlas Drive</span>
-        <span class="text-sm font-bold text-gray-700">🔴🟠</span>
-        <span class="text-sm font-bold text-blue-800">PayPal</span>
-        <span class="text-sm font-bold text-blue-900 italic text-base">VISA</span>
-      </div>
-    </footer>
+    <Footer />
 
   </div>
 </template>
@@ -124,7 +110,7 @@
 import { Link } from '@inertiajs/vue3'
 import Navbar from '@/Components/Navbar.vue'
 import HeroSection from '@/Components/HeroSection.vue'
-
+import Footer from '@/Components/Footer.vue'
 const categories = [
   {
     name: 'Luxury',
