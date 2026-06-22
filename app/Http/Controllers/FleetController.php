@@ -45,7 +45,7 @@ class FleetController extends Controller
             'count' => Voiture::where('category_id', $c->id)->count(),
         ]);
 
-        return Inertia::render('fleet', [
+        return Inertia::render('Fleet', [
             'cars'       => $cars,
             'categories' => $categories,
         ]);
