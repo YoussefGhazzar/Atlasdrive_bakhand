@@ -42,8 +42,8 @@ class ClientController extends Controller
  
             $activeRental = [
                 'car'        => $active->voiture->marque . ' ' . $active->voiture->modele,
-                'agency'     => $active->voiture->agency->name ?? '',
-                'city'       => $active->voiture->agency->city ?? '',
+                'agency'     => $active->voiture->agence->nom_agence ?? '',
+                'city'       => $active->voiture->agence->city ?? '',
                 'startDate'  => $start->format('M j'),
                 'returnDate' => $end->format('M j'),
                 'daysLeft'   => max(0, $today->diffInDays($end, false)),
@@ -65,7 +65,7 @@ class ClientController extends Controller
             'days'   => Carbon::parse($r->date_debut)->diffInDays($r->date_fin),
             'total'  => $r->prix_total,
             'status' => $r->statut_label,   // uses getStatutLabelAttribute()
-            'image'  => $r->voiture->image ?? '',
+                'image' => $r->voiture->image ? asset('/' . ltrim($r->voiture->image, '/')) : 'default-car.png',
         ]);
  
         // ── Stats cards ──────────────────────────────────────
@@ -128,7 +128,7 @@ class ClientController extends Controller
                 'days'   => Carbon::parse($r->date_debut)->diffInDays($r->date_fin),
                 'total'  => $r->prix_total,
                 'status' => $r->statut_label,
-                'image'  => $r->voiture->image ?? '',
+                'image'  => $r->voiture->image ? asset('/' . ltrim($r->voiture->image, '/')) : 'default-car.png',
             ]);
  
         return Inertia::render('Dashboard/Client/Bookings', [
@@ -137,43 +137,63 @@ class ClientController extends Controller
         ]);
     }
 
-     public function active()
-    {
-        $user   = auth()->user();
-        $active = $user->reservations()
-            ->where('statut', 'active')
-            ->with(['voiture.agency'])
-            ->latest()
-            ->first();
+    
+// GET /client/active  →  Pages/Dashboard/Client/ActiveRental.vue
+public function active()
+{
+    $user = auth()->user();
  
-        $activeRental = null;
-        if ($active) {
-            $start    = Carbon::parse($active->date_debut);
-            $end      = Carbon::parse($active->date_fin);
-            $today    = Carbon::today();
-            $total    = $start->diffInDays($end);
-            $elapsed  = $start->diffInDays($today);
+    $active = $user->reservations()
+        ->where('statut', 'active')
+        ->with(['voiture.category', 'voiture.agency'])
+        ->latest()
+        ->first();
  
-            $activeRental = [
-                'car'        => $active->voiture->marque . ' ' . $active->voiture->modele,
-                'agency'     => $active->voiture->agency->name ?? '',
-                'city'       => $active->voiture->agency->city ?? '',
-                'startDate'  => $start->format('M j'),
-                'returnDate' => $end->format('M j'),
-                'daysLeft'   => max(0, $today->diffInDays($end, false)),
-                'total'      => $active->prix_total,
-                'progress'   => $total > 0 ? min(100, round(($elapsed / $total) * 100)) : 0,
-                'image'      => $active->voiture->image ?? '',
-            ];
-        }
+    $activeRental = null;
  
-        return Inertia::render('Dashboard/Client/ActiveRental', [
-            'client'       => $user,
-            'activeRental' => $activeRental,
-        ]);
+    if ($active) {
+        $start = Carbon::parse($active->date_debut);
+        $end   = Carbon::parse($active->date_fin);
+        $today = Carbon::today();
+ 
+        $totalDays   = $start->diffInDays($end);
+        $elapsedDays = $start->diffInDays($today);
+ 
+        // Clamp progress between 0–100 to avoid weird values if dates are off
+        $progress = $totalDays > 0
+            ? min(100, max(0, round(($elapsedDays / $totalDays) * 100)))
+            : 0;
+ 
+        $activeRental = [
+            'car'        => $active->voiture->marque . ' ' . $active->voiture->modele,
+            'agency'     => $active->voiture->agence->name  ?? '',
+            'city'       => $active->voiture->agence->city  ?? '',
+            'startDate'  => $start->format('M j'),
+            'returnDate' => $end->format('M j'),
+            'daysLeft'   => max(0, $today->diffInDays($end, false)),
+            'total'      => $active->prix_total,
+            'progress'   => $progress,
+  'image'           => $active->voiture->image 
+                ? asset('/' . ltrim($active->voiture->image, '/')) 
+                : '/images/default-car.png',  
+                      ];
+    $email = $user->email;
+    $client = Client::where('email', $email)->first();
+    if ($client) {
+        $activeRental['licenseNumber'] = $client->licenseNumber;
+        $activeRental['numero_permis'] = $client->numero_permis;
+        $activeRental['date_expiration_permis'] = $client->date_expiration_permis;
+        
     }
 
-    public function fleet(){
+ 
+    return Inertia::render('Dashboard/Client/ActiveRental', [
+        'client'       => $user,
+        'activeRental' => $activeRental,
+    ]);
+}
+}
+public function fleet(){
         $cars = Voiture::with(['category', 'agency'])
             ->get()
             ->map(fn($v) => [
@@ -200,6 +220,8 @@ class ClientController extends Controller
             'categories' => $categories,
         ]);
     }
+
+    
     
 
     /**
