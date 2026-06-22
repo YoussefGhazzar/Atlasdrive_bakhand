@@ -24,7 +24,6 @@
         >
           {{ link.label }}
         </Link>
-        
       </li>
     </ul>
 
@@ -50,7 +49,5 @@ const $page = usePage()
 const navLinks = [
   { label: 'Home',     route: 'home'     },
   { label: 'Fleet',    route: 'fleet'    },
-  { label: 'Services', route: 'services' },
-
 ]
-</script>composer 
+</script>
