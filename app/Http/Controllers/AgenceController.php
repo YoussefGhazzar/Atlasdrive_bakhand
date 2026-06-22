@@ -12,7 +12,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Category;
 use App\Models\Reservation;
-
+use Carbon\Carbon;
 
 class AgenceController extends Controller
 {
@@ -23,7 +23,7 @@ class AgenceController extends Controller
     {
        // return Inertia::render('Dashboard/AgenceDashboard');
         return Inertia::render('Dashboard/Agency/Overview', [
-            'agency' => auth()->user()->agency ?? auth()->user(),
+            'agency' => auth()->user()->agence ?? auth()->user(),
         ]);
     }
 
@@ -96,19 +96,86 @@ class AgenceController extends Controller
  private function agencyData()
     {
         $user   = auth()->user();
-        $agency = $user->agency ?? $user;
+        $agency = $user->agence ?? $user;
         return $agency;
     }
  
-    // GET /agence/dashboard  → Pages/Dashboard/Agency/Overview.vue
-    public function overview()
-    {
-        return Inertia::render('Dashboard/Agency/Overview', [
-            'agency'         => $this->agencyData(),
-            'stats'          => [],
-            'recentBookings' => [],
+   // GET /agence/dashboard & /agence/overview
+public function overview()
+{
+    $agency = auth()->user()->agence;
+ 
+    // ── Stats cards ──────────────────────────────────────
+    $totalRevenue   = Reservation::where('agency_id', $agency->id)
+        ->whereIn('statut', ['confirmee', 'active', 'terminee'])
+        ->sum('prix_total');
+ 
+    $activeBookings = Reservation::where('agency_id', $agency->id)
+        ->whereIn('statut', ['confirmee', 'active'])
+        ->count();
+ 
+    $fleetSize = Voiture::where('agency_id', $agency->id)->count();
+ 
+    $stats = [
+        [
+            'label'  => 'Total Revenue',
+            'value'  => '$' . number_format($totalRevenue, 0),
+            'change' => '+12%',   // replace with real MoM calc when you have historical data
+            'up'     => true,
+            'color'  => '#0d9488',
+            'icon'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        ],
+        [
+            'label'  => 'Active Bookings',
+            'value'  => (string) $activeBookings,
+            'change' => '+5%',
+            'up'     => true,
+            'color'  => '#6366f1',
+            'icon'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        ],
+        [
+            'label'  => 'Fleet Size',
+            'value'  => (string) $fleetSize,
+            'change' => '+2',
+            'up'     => true,
+            'color'  => '#f59e0b',
+            'icon'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="9" rx="2"/><path d="M5 9V7a2 2 0 012-2h10a2 2 0 012 2v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+        ],
+        [
+            'label'  => 'Avg Rating',
+            'value'  => '4.8★',   // replace with real avg when you have a reviews table
+            'change' => '+0.2',
+            'up'     => true,
+            'color'  => '#ec4899',
+            'icon'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+        ],
+    ];
+ 
+    // ── Recent bookings (last 5) ─────────────────────────
+    $recentBookings = Reservation::where('agency_id', $agency->id)
+        ->with(['voiture', 'user'])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(fn($r) => [
+            'id'          => $r->id,
+            'client'      => $r->user->prenom . ' ' . $r->user->nom,
+            'initials'    => strtoupper(substr($r->user->prenom, 0, 1) . substr($r->user->nom, 0, 1)),
+            'avatarColor' => $this->colorFor($r->user->id),
+            'vehicle'     => $r->voiture->marque . ' ' . $r->voiture->modele,
+            'dates'       => Carbon::parse($r->date_debut)->format('M j')
+                           . '–'
+                           . Carbon::parse($r->date_fin)->format('M j'),
+            'amount'      => $r->prix_total,
+            'status'      => $r->statut_label,
         ]);
-    }
+ 
+    return Inertia::render('Dashboard/Agency/Overview', [
+        'agency'         => $agency,
+        'stats'          => $stats,
+        'recentBookings' => $recentBookings,
+    ]);
+}
  
  public function fleet()
 {
@@ -216,7 +283,7 @@ public function updateFleet(Request $request, Voiture $voiture)
         if ($voiture->image) {
             Storage::disk('public')->delete($voiture->image);
         }
-        $data['image'] = $request->file('image')->store('images', 'public');
+        $data['image'] = $request->file('image')->store('storage/images', 'public');
     }
  
     $voiture->update($data);
@@ -237,20 +304,48 @@ public function destroyFleet(Voiture $voiture)
  
     return back()->with('success', 'Vehicle removed.');
 }
-    // GET /agence/bookings  → Pages/Dashboard/Agency/Bookings.vue
-    public function bookings()
-    {
-        return Inertia::render('Dashboard/Agency/Bookings', [
-            'agency'   => $this->agencyData(),
-            'bookings' => [],
-        ]);
-    }
+    
+// GET /agence/bookings  →  Pages/Dashboard/Agency/Bookings.vue
+public function bookings()
+{
+    $agency = auth()->user()->agence;
  
-    // GET /agence/earnings  → Pages/Dashboard/Agency/Earnings.vue
+    $bookings = Reservation::where('agency_id', $agency->id)
+        ->with(['voiture', 'user'])
+        ->latest()
+        ->get()
+        ->map(fn($r) => [
+            'id'          => $r->id,
+            'client'      => $r->user->prenom . ' ' . $r->user->nom,
+            'initials'    => strtoupper(substr($r->user->prenom, 0, 1) . substr($r->user->nom, 0, 1)),
+            'avatarColor' => $this->colorFor($r->user->id),
+            'vehicle'     => $r->voiture->marque . ' ' . $r->voiture->modele,
+            'pickup'      => Carbon::parse($r->date_debut)->format('M j'),
+            'return'      => Carbon::parse($r->date_fin)->format('M j'),
+            'days'        => Carbon::parse($r->date_debut)->diffInDays($r->date_fin),
+            'total'       => $r->prix_total,
+            'status'      => $r->statut_label,   // uses getStatutLabelAttribute()
+        ]);
+ 
+    return Inertia::render('Dashboard/Agency/Bookings', [
+        'agency'   => $agency,
+        'bookings' => $bookings,
+    ]);
+}
+    private function colorFor(int $userId): string
+{
+    $colors = ['#0d9488', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6', '#0891b2', '#16a34a'];
+    return $colors[$userId % count($colors)];
+}
+ 
+     // GET /agence/earnings
     public function earnings()
     {
+        $agence = auth()->user()->agence;
+        abort_unless($agence, 403);
+ 
         return Inertia::render('Dashboard/Agency/Earnings', [
-            'agency'            => $this->agencyData(),
+            'agency'            => $agence,
             'earningCards'      => [],
             'revenueByCategory' => [],
         ]);
@@ -282,8 +377,48 @@ public function destroyFleet(Voiture $voiture)
         return back()->with('success', 'Settings saved.');
     }
 
-
-
+  
+ public function updateBookingStatus(Request $request, Reservation $reservation)
+    {
+        $agence = auth()->user()->agence;
+ 
+        if (!$agence) {
+            abort(403, 'No agency associated with this account.');
+        }
+ 
+        abort_unless($reservation->agency_id === $agence->id, 403);
+ 
+        $request->validate([
+            'statut' => ['required', 'in:en_attente,confirmee,active,terminee,annulee'],
+        ]);
+ 
+        $allowedTransitions = [
+            'en_attente' => ['confirmee', 'annulee'],
+            'confirmee'  => ['active', 'annulee'],
+            'active'     => ['terminee'],
+            'terminee'   => [],
+            'annulee'    => [],
+        ];
+ 
+        if (!in_array($request->statut, $allowedTransitions[$reservation->statut] ?? [])) {
+            return back()->withErrors([
+                'statut' => "Cannot change status from {$reservation->statut} to {$request->statut}.",
+            ]);
+        }
+ 
+        $reservation->update(['statut' => $request->statut]);
+ 
+        if ($request->statut === 'active') {
+            $reservation->voiture->update(['disponible' => false]);
+        }
+ 
+        if ($request->statut === 'terminee') {
+            $reservation->voiture->update(['disponible' => true]);
+        }
+ 
+        return back()->with('success', 'Booking status updated.');
+    }
+ 
     /**
      * Display the specified resource.
      */
