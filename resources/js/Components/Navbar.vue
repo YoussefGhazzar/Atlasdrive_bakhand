@@ -18,7 +18,7 @@
         <Link
           :href="route(link.route)"
           class="text-slate-500 hover:text-teal-600 no-underline text-[0.95rem] font-medium transition-colors duration-200"
-          :class="{ 'text-teal-600 font-semibold': $page.url === link.href }"
+          :class="{ 'text-teal-600 font-semibold': $page.url === route(link.route) }"
           style="font-family:'Sora',sans-serif;"
         >
           {{ link.label }}
@@ -40,11 +40,13 @@
 
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
+import { route } from 'ziggy-js'
 
 const $page = usePage()
 
 const navLinks = [
-  { label: 'Home',     route: 'home',     href: '/'          },
- 
+  { label: 'Home',     route: 'home'     },
+  { label: 'Fleet',    route: 'fleet'    },
+  { label: 'Services', route: 'services' },
 ]
-</script>
+</script>composer 
