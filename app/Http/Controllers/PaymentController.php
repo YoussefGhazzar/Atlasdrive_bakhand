@@ -28,8 +28,8 @@ class PaymentController extends Controller
         'cvv'          => ['required', 'string'],
     ]);
 
+    $agency = auth()->user()->agency;
     $user = auth()->user();
-    $agency = $user->agences; // Relation user -> agence
 
     // 1. Calcul dyal l-amount (Price Logic)
     $prices = ['starter' => 29, 'professional' => 79, 'enterprise' => 199];
