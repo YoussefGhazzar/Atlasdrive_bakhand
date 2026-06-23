@@ -71,11 +71,14 @@ Route::middleware(['auth', 'role:agence'])->group(function () {
     ->name('agence.bookings.status');
 });
 
+
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard',  [AdminController::class, 'overview'] )->name('admin.dashboard');
     Route::get('/admin/overview',   [AdminController::class, 'overview'] )->name('admin.overview');
     Route::get('/admin/agencies',   [AdminController::class, 'agencies'] )->name('admin.agencies');
+    Route::patch('/admin/agencies/{agence}/status', [AdminController::class, 'updateAgencyStatus'])->name('admin.agencies.status');
     Route::get('/admin/users',      [AdminController::class, 'users']    )->name('admin.users');
+    Route::patch('/admin/users/{user}/toggle-ban', [AdminController::class, 'toggleUserBan'])->name('admin.users.toggle-ban');
     Route::get('/admin/bookings',   [AdminController::class, 'bookings'] )->name('admin.bookings');
     Route::get('/admin/reports',    [AdminController::class, 'reports']  )->name('admin.reports');
 });
