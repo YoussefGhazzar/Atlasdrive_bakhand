@@ -14,7 +14,7 @@ class Agence extends Model
     }
     public function voitures()
     {
-        return $this->hasMany(Voiture::class);
+        return $this->hasMany(Voiture::class, 'agency_id');
     }
     public function reservations()
     {
