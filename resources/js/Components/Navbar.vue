@@ -49,5 +49,6 @@ const $page = usePage()
 const navLinks = [
   { label: 'Home',     route: 'home'     },
   { label: 'Fleet',    route: 'fleet'    },
+  { label: 'Services', route: 'services' } 
 ]
 </script>
