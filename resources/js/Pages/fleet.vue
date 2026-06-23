@@ -354,16 +354,16 @@
       </div>
     </div>
 
-    <footer />
-
   </div>
+
+<Footer />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import navbar from '@/Components/Navbar.vue'
-import footer from '@/Components/Footer.vue'
+import Footer from '@/Components/Footer.vue'
 
 // Cars now come from the Laravel controller as a prop, not a local ref
 const props = defineProps({
