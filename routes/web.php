@@ -25,6 +25,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('l
 Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('Auth/logout');
+    Route::get('/services', fn () => Inertia::render('Services'))->name('services');
 
 Route::get('/register/client', [RegisteredUserController::class, 'client'])
     ->middleware('guest')
