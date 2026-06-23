@@ -243,10 +243,14 @@
       </div>
     </div>
   </div>
+
+<Footer />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import navbar from '@/Components/Navbar.vue'
+import Footer from '@/Components/Footer.vue'
 import { Link, usePage } from '@inertiajs/vue3'
 
 const $page = usePage()

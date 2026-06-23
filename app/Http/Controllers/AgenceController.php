@@ -247,9 +247,12 @@ public function storeFleet(Request $request)
         'disponible'      => $request->boolean('disponible'),
     ];
  
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('images', 'public');
-    }
+   if ($request->hasFile('image')) {
+    $path = $request->file('image')->store('images', 'public');
+ 
+    // Prefix with "storage/" before saving to DB
+    $data['image'] = 'storage/' . $path;
+}
  
     Voiture::create($data);
  
@@ -338,18 +341,89 @@ public function bookings()
     return $colors[$userId % count($colors)];
 }
  
-     // GET /agence/earnings
-    public function earnings()
-    {
-        $agence = auth()->user()->agence;
-        abort_unless($agence, 403);
+   
+// GET /agence/earnings  →  Pages/Dashboard/Agency/Earnings.vue
+public function earnings()
+{
+    $agence = auth()->user()->agence;
+    abort_unless($agence, 403);
  
-        return Inertia::render('Dashboard/Agency/Earnings', [
-            'agency'            => $agence,
-            'earningCards'      => [],
-            'revenueByCategory' => [],
-        ]);
-    }
+    $now        = Carbon::now();
+    $thisMonth  = $now->copy()->startOfMonth();
+    $lastMonth  = $now->copy()->subMonth()->startOfMonth();
+    $lastMonthEnd = $now->copy()->subMonth()->endOfMonth();
+ 
+    // ── Earning cards: This month / Last month / Total this year ──
+    $thisMonthRevenue = Reservation::where('agency_id', $agence->id)
+        ->whereIn('statut', ['confirmee', 'active', 'terminee'])
+        ->where('date_debut', '>=', $thisMonth)
+        ->sum('prix_total');
+ 
+    $lastMonthRevenue = Reservation::where('agency_id', $agence->id)
+        ->whereIn('statut', ['confirmee', 'active', 'terminee'])
+        ->whereBetween('date_debut', [$lastMonth, $lastMonthEnd])
+        ->sum('prix_total');
+ 
+    $yearRevenue = Reservation::where('agency_id', $agence->id)
+        ->whereIn('statut', ['confirmee', 'active', 'terminee'])
+        ->whereYear('date_debut', $now->year)
+        ->sum('prix_total');
+ 
+    // % change vs last month (avoid division by zero)
+    $changeVsLastMonth = $lastMonthRevenue > 0
+        ? round((($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100)
+        : 0;
+ 
+    $earningCards = [
+        [
+            'label'  => 'This Month',
+            'value'  => number_format($thisMonthRevenue, 0),
+            'change' => ($changeVsLastMonth >= 0 ? '+' : '') . $changeVsLastMonth . '%',
+            'up'     => $changeVsLastMonth >= 0,
+        ],
+        [
+            'label'  => 'Last Month',
+            'value'  => number_format($lastMonthRevenue, 0),
+            'change' => '—',
+            'up'     => true,
+        ],
+        [
+            'label'  => 'Total ' . $now->year,
+            'value'  => number_format($yearRevenue, 0),
+            'change' => '+' . round((($yearRevenue ?: 1) / max($yearRevenue, 1)) * 100 - 100) . '%',
+            'up'     => true,
+        ],
+    ];
+ 
+    // ── Revenue by category ──────────────────────────────
+    $revenueByCategory = Reservation::where('reservations.agency_id', $agence->id)
+        ->whereIn('reservations.statut', ['confirmee', 'active', 'terminee'])
+        ->join('voitures', 'voitures.id', '=', 'reservations.voiture_id')
+        ->join('categories', 'categories.id', '=', 'voitures.category_id')
+        ->selectRaw('categories.name as name, SUM(reservations.prix_total) as revenue')
+        ->groupBy('categories.name')
+        ->orderByDesc('revenue')
+        ->get();
+ 
+    $maxRevenue = $revenueByCategory->max('revenue') ?: 1;
+ 
+    $colors = ['#0d9488', '#6366f1', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899'];
+ 
+    $revenueByCategory = $revenueByCategory->map(function ($row, $i) use ($maxRevenue, $colors) {
+        return [
+            'name'    => $row->name,
+            'revenue' => number_format($row->revenue, 0),
+            'pct'     => round(($row->revenue / $maxRevenue) * 100),
+            'color'   => $colors[$i % count($colors)],
+        ];
+    });
+ 
+    return Inertia::render('Dashboard/Agency/Earnings', [
+        'agency'            => $agence,
+        'earningCards'      => $earningCards,
+        'revenueByCategory' => $revenueByCategory,
+    ]);
+}
  
     // GET /agence/settings  → Pages/Dashboard/Agency/Settings.vue
     public function settings()
