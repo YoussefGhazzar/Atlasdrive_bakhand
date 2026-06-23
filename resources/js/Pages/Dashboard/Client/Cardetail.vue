@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-slate-50" style="font-family:'Sora',sans-serif;">
-    <Navbar />
 
     <div class="max-w-6xl mx-auto px-6 py-10">
 
