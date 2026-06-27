@@ -1,0 +1,108 @@
+<?php
+
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AgenceController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Auth\AgencyRegisterController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\FleetController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservationController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('Auth/login');
+
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
+Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('Auth/logout');
+    Route::get('/services', fn () => Inertia::render('Services'))->name('services');
+
+Route::get('/register/client', [RegisteredUserController::class, 'client'])
+    ->middleware('guest')
+    ->name('register.client');
+
+Route::get('/register/agency', [RegisteredUserController::class, 'agency'])
+    ->middleware('guest')
+    ->name('agency.register');
+Route::post('/register/client', [RegisteredUserController::class, 'registerClient'])
+    ->middleware('guest')
+    ->name('register.client.store');
+Route::post('/register/agency', [RegisteredUserController::class, 'registerAgency'])
+    ->middleware('guest')
+    ->name('agency.register.store');
+
+
+
+Route::middleware(['auth', 'role:client'])->group(function () {
+    Route::get('/client/dashboard', [ClientController::class, 'index']   )->name('client.dashboard');
+    Route::get('/client/bookings',  [ClientController::class, 'bookings'])->name('client.bookings');
+    Route::get('/client/active',    [ClientController::class, 'active']  )->name('client.active');
+    Route::get('/client/fleet',     [ClientController::class, 'fleet']   )->name('client.fleet');
+
+   
+});
+
+Route::middleware(['auth', 'role:agence'])->group(function () {
+    Route::get('/agence/dashboard', [AgenceController::class, 'index'])->name('agency.dashboard');
+    
+    Route::get('/agency/select-plan', fn () => Inertia::render('pricing'))->name('agency.select-plan');
+    Route::get('/agency/payment', [PaymentController::class, 'create'])->name('agency.payment');
+    Route::post('/agency/payment', [PaymentController::class, 'store'])->name('agency.payment.store');
+
+ Route::get('/agence/dashboard',  [AgenceController::class, 'overview']      )->name('agency.dashboard');
+    Route::get('/agence/overview',   [AgenceController::class, 'overview']      )->name('agency.overview');
+     Route::get('/agence/fleet',           [AgenceController::class, 'fleet']       )->name('agence.fleet');
+     Route::post('/agence/fleet',          [AgenceController::class, 'storeFleet']  )->name('agence.fleet.store');
+     Route::put('/agence/fleet/{voiture}', [AgenceController::class, 'updateFleet'] )->name('agence.fleet.update');
+     Route::delete('/agence/fleet/{voiture}', [AgenceController::class, 'destroyFleet'])->name('agence.fleet.destroy');    Route::get('/agency/bookings',   [AgenceController::class, 'bookings'] )->name('agency.bookings');
+    Route::get('/agency/earnings',   [AgenceController::class, 'earnings'] )->name('agency.earnings');
+    Route::get('/agency/settings',   [AgenceController::class, 'settings'] )->name('agency.settings');
+    Route::patch('/agency/settings', [AgenceController::class, 'updateSettings'])->name('agency.settings.update');
+    Route::patch('/agence/bookings/{reservation}/status', [AgenceController::class, 'updateBookingStatus'])
+    ->name('agence.bookings.status');
+});
+
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard',  [AdminController::class, 'overview'] )->name('admin.dashboard');
+    Route::get('/admin/overview',   [AdminController::class, 'overview'] )->name('admin.overview');
+    Route::get('/admin/agencies',   [AdminController::class, 'agencies'] )->name('admin.agencies');
+    Route::patch('/admin/agencies/{agence}/status', [AdminController::class, 'updateAgencyStatus'])->name('admin.agencies.status');
+    Route::get('/admin/users',      [AdminController::class, 'users']    )->name('admin.users');
+    Route::patch('/admin/users/{user}/toggle-ban', [AdminController::class, 'toggleUserBan'])->name('admin.users.toggle-ban');
+    Route::get('/admin/bookings',   [AdminController::class, 'bookings'] )->name('admin.bookings');
+    Route::get('/admin/reports',    [AdminController::class, 'reports']  )->name('admin.reports');
+});
+
+ Route::get('/cars/{voiture}', [ReservationController::class, 'show'])->name('cars.show');
+ 
+// ── Protected: only logged-in clients can SUBMIT a booking ─
+    Route::middleware(['auth', 'role:client'])->group(function () {
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+});
+
+Route::get('/fleet', [FleetController::class, 'index'])->name('fleet');
+
+Route::get('/chatbot', function () {
+    return Inertia::render('ChatBot/Index');
+});
+Route::post('/chatbot', [ChatBotController::class, 'chat'])->name('chatbot.chat');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';

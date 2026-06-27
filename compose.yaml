@@ -1,0 +1,30 @@
+services:
+
+  app:
+    build: .
+    container_name: laravel_app
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: Multipe_agence_location
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+
+networks:
+  sail:
+    driver: bridge
+
+volumes:
+  sail-pgsql:
+    driver: local  

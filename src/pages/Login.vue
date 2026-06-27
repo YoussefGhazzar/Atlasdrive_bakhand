@@ -1,0 +1,280 @@
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <Navbar />
+
+    <div class="flex min-h-screen pt-16">
+
+      <!-- ── Panneau gauche ── -->
+      <div
+        class="relative hidden lg:flex flex-col justify-end w-1/2 flex-shrink-0 overflow-hidden px-14 pb-16 pt-14"
+        style="background: linear-gradient(145deg, #f0fdfb 0%, #e0f7f4 40%, #c8f0eb 100%)"
+      >
+        <!-- Cercles décoratifs -->
+        <div class="pointer-events-none absolute -top-28 -right-28 w-[480px] h-[480px] rounded-full"
+          style="background: radial-gradient(circle, rgba(27,168,154,.15) 0%, transparent 70%)"></div>
+        <div class="pointer-events-none absolute -bottom-20 -left-20 w-80 h-80 rounded-full"
+          style="background: radial-gradient(circle, rgba(27,168,154,.1) 0%, transparent 70%)"></div>
+        <!-- Motif points -->
+        <div class="pointer-events-none absolute inset-0 opacity-60"
+          style="background-image: radial-gradient(circle, rgba(27,168,154,.18) 1px, transparent 1px); background-size: 28px 28px"></div>
+
+        <div class="relative z-10">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full border text-[11px] font-semibold uppercase"
+            style="background: rgba(27,168,154,.1); border-color: rgba(27,168,154,.25); color: #148a7e; letter-spacing: 1.8px">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#1BA89A] animate-pulse"></span>
+            Espace Client
+          </div>
+
+          <!-- Titre -->
+          <div class="font-extrabold leading-[1.1] tracking-tight text-gray-900 mb-4"
+            style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(36px, 4vw, 52px)">
+            Votre route,<br>
+            <span class="text-[#1BA89A]">vos règles.</span>
+          </div>
+
+          <!-- Description -->
+          <p class="text-[15px] leading-relaxed text-gray-500 max-w-sm mb-10">
+            Accédez à plus de 500 véhicules dans toutes les grandes villes du Maroc.
+            Comparez, réservez et conduisez — en quelques clics.
+          </p>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-3 mb-8">
+            <div v-for="s in stats" :key="s.val"
+              class="bg-white rounded-[14px] px-3.5 py-4 shadow-sm"
+              style="border: 1px solid rgba(27,168,154,.15)">
+              <div class="text-[26px] font-extrabold text-[#1BA89A] leading-none mb-1"
+                style="font-family: 'Plus Jakarta Sans', sans-serif">{{ s.val }}</div>
+              <div class="text-[11px] font-medium text-gray-400 uppercase tracking-wide">{{ s.lbl }}</div>
+            </div>
+          </div>
+
+          <!-- Pills -->
+          <div class="flex flex-wrap gap-2">
+            <div v-for="pill in pills" :key="pill"
+              class="flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-gray-700 shadow-sm">
+              <span class="text-[#1BA89A] font-bold">✓</span> {{ pill }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panneau droit ── -->
+      <div class="flex flex-1 items-center justify-center overflow-y-auto bg-white border-l border-gray-200 px-10 py-12 lg:px-10 md:px-6 sm:px-4">
+        <div class="w-full max-w-[430px]" style="animation: slideIn .45s cubic-bezier(.4,0,.2,1) both">
+
+          <!-- Onglets rôle -->
+          <div class="grid grid-cols-2 gap-1 bg-gray-100 border border-gray-200 rounded-[14px] p-1 mb-5">
+            <button
+              v-for="tab in tabs" :key="tab.key"
+              @click="role = tab.key"
+              :class="[
+                'flex items-center justify-center gap-2 py-[11px] px-3.5 rounded-[10px] text-[13.5px] font-medium cursor-pointer border-none transition-all duration-200',
+                role === tab.key
+                  ? 'bg-white text-gray-900 font-semibold shadow-sm'
+                  : 'bg-transparent text-gray-400 hover:text-gray-600 hover:bg-white/50'
+              ]"
+              style="font-family: 'Outfit', sans-serif"
+            >
+              <span class="text-[15px]">{{ tab.icon }}</span> {{ tab.label }}
+            </button>
+          </div>
+
+          <!-- Alerte -->
+          <Transition name="fade-down">
+            <div v-if="alert.show"
+              :class="[
+                'flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] text-[13px] border mb-4',
+                alert.type === 'success'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : 'bg-red-50 border-red-200 text-red-800'
+              ]">
+              {{ alert.message }}
+            </div>
+          </Transition>
+
+          <!-- Titre -->
+          <div class="text-[24px] font-extrabold text-gray-900 mb-1"
+            style="font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -.4px">
+            {{ role === 'agency' ? 'Espace Agence' : 'Bon retour !' }}
+          </div>
+          <div class="text-[13.5px] text-gray-400 mb-5 leading-relaxed">
+            {{ role === 'agency'
+              ? 'Gérez votre flotte, vos réservations et vos revenus.'
+              : 'Accédez à votre espace et réservez votre prochain véhicule.' }}
+          </div>
+
+          <!-- Champs -->
+          <div class="flex flex-col gap-3.5">
+
+            <!-- Email -->
+            <div class="flex flex-col gap-1.5">
+              <label for="email"
+                class="text-[11px] font-semibold uppercase text-gray-400"
+                style="letter-spacing: 1.2px">Adresse email</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-gray-400 text-sm pointer-events-none z-10">✉</span>
+                <input
+                  id="email" type="email"
+                  :placeholder="role === 'agency' ? 'contact@agence.ma' : 'vous@gmail.com'"
+                  v-model="form.email"
+                  :class="[
+                    'w-full pl-9 pr-3 py-2.5 rounded-[10px] text-[14px] text-gray-900 outline-none transition-all duration-200',
+                    errors.email
+                      ? 'border-[1.5px] border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
+                      : 'border-[1.5px] border-gray-200 bg-gray-50 focus:border-[#1BA89A] focus:bg-white focus:ring-2 focus:ring-[#1BA89A]/10'
+                  ]"
+                  style="font-family: 'Outfit', sans-serif"
+                />
+              </div>
+              <p v-if="errors.email" class="text-[11.5px] text-red-600 pl-0.5">{{ errors.email }}</p>
+            </div>
+
+            <!-- Mot de passe -->
+            <div class="flex flex-col gap-1.5">
+              <label for="password"
+                class="text-[11px] font-semibold uppercase text-gray-400"
+                style="letter-spacing: 1.2px">Mot de passe</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-gray-400 text-sm pointer-events-none z-10">🔒</span>
+                <input
+                  id="password"
+                  :type="showPass ? 'text' : 'password'"
+                  placeholder="••••••••"
+                  v-model="form.password"
+                  :class="[
+                    'w-full pl-9 pr-10 py-2.5 rounded-[10px] text-[14px] text-gray-900 outline-none transition-all duration-200',
+                    errors.password
+                      ? 'border-[1.5px] border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
+                      : 'border-[1.5px] border-gray-200 bg-gray-50 focus:border-[#1BA89A] focus:bg-white focus:ring-2 focus:ring-[#1BA89A]/10'
+                  ]"
+                  style="font-family: 'Outfit', sans-serif"
+                />
+                <button type="button" @click="showPass = !showPass"
+                  class="absolute right-3 bg-transparent border-none text-gray-400 cursor-pointer text-sm p-0 hover:text-gray-700 transition-colors">
+                  {{ showPass ? '🙈' : '👁' }}
+                </button>
+              </div>
+              <p v-if="errors.password" class="text-[11.5px] text-red-600 pl-0.5">{{ errors.password }}</p>
+            </div>
+
+            <!-- Mot de passe oublié -->
+            <div class="text-right -mt-1">
+              <a href="#" class="text-[12.5px] text-[#1BA89A] font-medium hover:underline cursor-pointer">
+                Mot de passe oublié ?
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Bouton soumettre -->
+          <button
+            @click="handleSubmit"
+            :disabled="loading"
+            class="relative w-full mt-[18px] px-5 py-[13px] bg-[#1BA89A] hover:bg-[#148a7e] text-white rounded-[14px] text-[15px] font-bold flex items-center justify-center gap-2 overflow-hidden cursor-pointer border-none transition-all duration-200 active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+            style="font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 4px 16px rgba(27,168,154,.3)"
+          >
+            <span v-if="loading"
+              class="w-4 h-4 flex-shrink-0 rounded-full animate-spin"
+              style="border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff"></span>
+            <span>{{ loading ? 'Connexion...' : '→ Se connecter' }}</span>
+          </button>
+
+          <!-- Lien inscription -->
+          <div class="mt-[18px] text-center text-[13.5px] text-gray-400">
+            Pas encore de compte ?
+            <router-link to="/register" class="text-[#1BA89A] font-semibold hover:underline no-underline">
+              S'inscrire gratuitement
+            </router-link>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="flex justify-center flex-wrap gap-5 mt-6 pt-5 border-t border-gray-100">
+            <div v-for="badge in trustBadges" :key="badge"
+              class="flex items-center gap-1.5 text-[11.5px] text-gray-300">
+              {{ badge }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive } from 'vue'
+import NavBar from '../components/Navbar.vue'
+
+const role     = ref('client')
+const showPass = ref(false)
+const loading  = ref(false)
+
+const form   = reactive({ email: '', password: '' })
+const errors = reactive({})
+const alert  = reactive({ show: false, type: '', message: '' })
+
+const tabs = [
+  { key: 'client', icon: '👤', label: 'Client' },
+  { key: 'agency', icon: '🏢', label: 'Agence' },
+]
+const stats = [
+  { val: '500+', lbl: 'Véhicules' },
+  { val: '50+',  lbl: 'Agences'   },
+  { val: '15',   lbl: 'Villes'    },
+]
+const pills = ['Réservation instantanée', 'Sans frais cachés', 'Annulation flexible', 'Assurance incluse']
+const trustBadges = ['🔒 SSL sécurisé', '🛡 Données protégées', '📍 Maroc & International']
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validate() {
+  Object.keys(errors).forEach(k => delete errors[k])
+  let ok = true
+  if (!form.email)                     { errors.email    = 'Email requis.';          ok = false }
+  else if (!EMAIL_RE.test(form.email)) { errors.email    = 'Email invalide.';        ok = false }
+  if (!form.password)                  { errors.password = 'Mot de passe requis.';   ok = false }
+  else if (form.password.length < 6)   { errors.password = 'Minimum 6 caractères.'; ok = false }
+  return ok
+}
+
+function showAlertMsg(type, message) {
+  alert.show = true; alert.type = type; alert.message = message
+  setTimeout(() => { alert.show = false }, 5000)
+}
+
+async function handleSubmit() {
+  if (!validate()) return
+  loading.value = true
+  try {
+    const res  = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, role: role.value })
+    })
+    const data = await res.json()
+    if (data.success) showAlertMsg('success', `✅ ${data.message}`)
+    else              showAlertMsg('danger',  `❌ ${data.message}`)
+  } catch {
+    showAlertMsg('danger', '❌ Erreur de connexion au serveur.')
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<style scoped>
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; }
+}
+.fade-down-enter-active { animation: fadeDown .3s ease; }
+.fade-down-leave-active { transition: opacity .2s; }
+.fade-down-leave-to     { opacity: 0; }
+</style>
