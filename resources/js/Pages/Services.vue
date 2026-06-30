@@ -317,7 +317,8 @@ const bookingCategory = ref('')
 const navLinks = [
   { label: 'Home',     href: '/',         active: false },
   { label: 'Fleet',    href: '/fleet',    active: false },
-  { label: 'Services', href: '/services', active: true  },
+  { label: 'Services', href: '/services', active: false },
+  { label: 'Contact',  href: '/contact',  active: false },
 ]
 
 const cities = ['Casablanca', 'Marrakech', 'Rabat', 'Fès', 'Tanger', 'Agadir', 'Meknès', 'Oujda']

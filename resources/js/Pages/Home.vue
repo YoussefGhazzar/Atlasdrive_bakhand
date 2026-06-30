@@ -278,6 +278,7 @@ const navLinks = [
   { label: 'Home',     route: 'home'     },
   { label: 'Fleet',    route: 'fleet'    },
   { label: 'Services', route: 'services' },
+          { label: 'Contact',  route: 'contact'  },
 ]
 
 const form = reactive({ location: '', dateFrom: '', dateTo: '', vehicleType: '' })

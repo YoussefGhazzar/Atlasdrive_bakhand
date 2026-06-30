@@ -98,3 +98,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
