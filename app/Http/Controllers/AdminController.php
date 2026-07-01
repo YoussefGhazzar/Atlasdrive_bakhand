@@ -65,7 +65,6 @@ class AdminController extends Controller
     // GET /admin/agencies
     public function agencies()
     {
-            $agency = auth()->user()->agence;
 
         $agencies = Agence::with('user')
             ->withCount('voitures')
