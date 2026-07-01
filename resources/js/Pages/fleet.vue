@@ -423,6 +423,7 @@ const navLinks = [
   { label: 'Home',     route: 'home'     },
   { label: 'Fleet',    route: 'fleet'    },
   { label: 'Services', route: 'services' },
+  { label: 'Contact',  route: 'contact'  },
 ]
 // Cars now come from the Laravel controller as a prop, not a local ref
 
