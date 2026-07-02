@@ -12,6 +12,7 @@ use App\Http\Controllers\FleetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -95,10 +96,21 @@ Route::get('/fleet', [FleetController::class, 'index'])->name('fleet');
 
 
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'agence') {
+            return redirect()->route('agency.dashboard');
+        }
+        return redirect()->route('client.dashboard');
+    })->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('contact', fn () => Inertia::render('Contact'))->name('contact');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 require __DIR__.'/auth.php';

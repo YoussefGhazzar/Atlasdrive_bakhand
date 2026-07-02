@@ -1,48 +1,7 @@
 <template>
   <div class="min-h-screen bg-slate-100 text-gray-900 font-sans overflow-x-hidden">
 
-    <!-- ── Floating Pill Navbar ── -->
-    <div class="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-      <nav class="pointer-events-auto w-full max-w-5xl bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl px-5 h-14 flex items-center justify-between"
-        style="box-shadow: 0 8px 32px rgba(13,148,136,0.10), 0 2px 8px rgba(0,0,0,0.08);">
-
-        <!-- Brand -->
-        <a href="/" class="flex items-center gap-2 no-underline">
-          <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 20L10 8L16 16L20 10L24 20" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 14L6 10" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <span class="font-bold text-lg text-slate-900 tracking-tight" style="font-family:'Sora',sans-serif;">
-            Atlas<span class="text-teal-600">Drive</span>
-          </span>
-        </a>
-
-        <!-- Nav Links -->
-        <ul class="flex items-center gap-1 list-none m-0 p-0">
-          <li v-for="link in navLinks" :key="link.label">
-            <a
-              :href="link.href"
-              class="text-slate-500 hover:text-slate-900 no-underline text-sm font-medium px-3.5 py-1.5 rounded-xl transition-all duration-200 hover:bg-slate-100"
-              :class="{ 'text-teal-600 font-semibold bg-teal-50 hover:bg-teal-50 hover:text-teal-600': link.active }"
-            >
-              {{ link.label }}
-            </a>
-          </li>
-        </ul>
-
-        <!-- Auth Buttons -->
-        <div class="flex items-center gap-2">
-          <a href="/login"
-            class="text-slate-600 hover:text-teal-600 font-semibold text-sm px-4 py-1.5 rounded-xl no-underline transition-colors duration-200 hover:bg-slate-100">
-            Log In
-          </a>
-          <a href="/register"
-            class="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm px-4 py-1.5 rounded-xl no-underline transition-all duration-150">
-            Sign Up
-          </a>
-        </div>
-      </nav>
-    </div>
+    <Navbar />
 
     <div class="h-24"/>
 
@@ -307,18 +266,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import Navbar from '@/Components/Navbar.vue'
 
 const activeStep      = ref(0)
 const bookingCity     = ref('')
 const pickupDate      = ref('')
 const returnDate      = ref('')
 const bookingCategory = ref('')
-
-const navLinks = [
-  { label: 'Home',     href: '/',         active: false },
-  { label: 'Fleet',    href: '/fleet',    active: false },
-  { label: 'Services', href: '/services', active: true  },
-]
 
 const cities = ['Casablanca', 'Marrakech', 'Rabat', 'Fès', 'Tanger', 'Agadir', 'Meknès', 'Oujda']
 
