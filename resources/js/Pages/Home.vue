@@ -52,7 +52,7 @@
     <section class="relative overflow-hidden min-h-[560px] flex items-center justify-center">
       <!-- Background image -->
       <div class="absolute inset-0"
-        style="background: url('/storage/images/background.png') center/cover no-repeat;"></div>
+        style="background: url('/images/background.png') center/cover no-repeat;"></div>
       <!-- Light overlay to keep text readable -->
       <div class="absolute inset-0" style="background: rgba(0,0,0,0);"></div>
 
@@ -263,7 +263,7 @@
     </section>
 
     <Footer />
-
+    <Chatwindow />
   </div>
 </template>
 
@@ -271,6 +271,7 @@
 import { reactive } from 'vue'
 import { Link, usePage, router } from '@inertiajs/vue3'
 import Footer from '@/Components/Footer.vue'
+import Chatwindow from '@/Components/ChatBot/Chatwindow.vue'
 
 const $page = usePage()
 
@@ -301,11 +302,11 @@ const trustItems = [
 ]
 
 const categories = [
-  { name: 'Luxury',   count: 48,  image: '/storage/images/luxury.jpg',   icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>` },
-  { name: 'SUV',      count: 76,  image: '/storage/images/suv.jpg',       icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="9" width="20" height="9" rx="2"/><path d="M5 9V7a2 2 0 012-2h10a2 2 0 012 2v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>` },
-  { name: 'Economy',  count: 120, image: '/storage/images/economic.jpg',  icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="10" width="20" height="8" rx="2"/><path d="M5 10V8a2 2 0 012-2h10a2 2 0 012 2v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>` },
-  { name: 'Electric', count: 34,  image: '/storage/images/electric.jpg',  icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
-  { name: 'Family',   count: 62,  image: '/storage/images/family.jpg',    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
+  { name: 'Luxury',   count: 48,  image: '/images/luxury.jpg',   icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>` },
+  { name: 'SUV',      count: 76,  image: '/images/suv.jpg',       icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="9" width="20" height="9" rx="2"/><path d="M5 9V7a2 2 0 012-2h10a2 2 0 012 2v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>` },
+  { name: 'Economy',  count: 120, image: '/images/economic.jpg',  icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="10" width="20" height="8" rx="2"/><path d="M5 10V8a2 2 0 012-2h10a2 2 0 012 2v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>` },
+  { name: 'Electric', count: 34,  image: '/images/electric.jpg',  icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
+  { name: 'Family',   count: 62,  image: '/images/family.jpg',    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
 ]
 
 const steps = [

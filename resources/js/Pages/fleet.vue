@@ -398,7 +398,7 @@
     </div>
  
     <Footer />
- 
+    <Chatwindow />
   </div>
 </template>
  
@@ -408,6 +408,7 @@ import { Link } from '@inertiajs/vue3'
  import { onMounted } from 'vue'
  import { usePage } from '@inertiajs/vue3'
 import Footer from '@/Components/Footer.vue'
+import Chatwindow from '@/Components/ChatBot/Chatwindow.vue'
 onMounted(() => {
   console.log("Les voitures li jyen men Laravel:", props.cars)
 })

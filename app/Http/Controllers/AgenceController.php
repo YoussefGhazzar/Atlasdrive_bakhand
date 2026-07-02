@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Category;
 use App\Models\Reservation;
+use App\Support\ImageUrlResolver;
 use Carbon\Carbon;
 
 class AgenceController extends Controller
@@ -199,9 +200,7 @@ public function overview()
             'disponible'      => $v->disponible,
             'category'        => $v->category,
             
-            'image'           => $v->image 
-                ? asset('/' . ltrim($v->image, '/')) 
-                : '/images/default-car.png',
+            'image'           => ImageUrlResolver::toPublicUrl($v->image),
         ]);
  
     $categories = Category::select('id', 'name')->get();

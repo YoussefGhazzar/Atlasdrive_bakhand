@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Models\Voiture;
 use App\Models\Category;
+use App\Support\ImageUrlResolver;
 
 
 class ClientController extends Controller
@@ -49,7 +50,7 @@ class ClientController extends Controller
                 'daysLeft'   => max(0, $today->diffInDays($end, false)),
                 'total'      => $active->prix_total,
                 'progress'   => min(100, max(0, $progress)),
-                'image'      => $active->voiture->image ?? '',
+                'image'      => ImageUrlResolver::toPublicUrl($active->voiture->image ?? null),
             ];
         }
  
@@ -65,7 +66,7 @@ class ClientController extends Controller
             'days'   => Carbon::parse($r->date_debut)->diffInDays($r->date_fin),
             'total'  => $r->prix_total,
             'status' => $r->statut_label,   // uses getStatutLabelAttribute()
-                'image' => $r->voiture->image ? asset('/' . ltrim($r->voiture->image, '/')) : 'default-car.png',
+                'image' => ImageUrlResolver::toPublicUrl($r->voiture->image),
         ]);
  
         // ── Stats cards ──────────────────────────────────────
@@ -128,7 +129,7 @@ class ClientController extends Controller
                 'days'   => Carbon::parse($r->date_debut)->diffInDays($r->date_fin),
                 'total'  => $r->prix_total,
                 'status' => $r->statut_label,
-                'image'  => $r->voiture->image ? asset('/' . ltrim($r->voiture->image, '/')) : 'default-car.png',
+                'image'  => ImageUrlResolver::toPublicUrl($r->voiture->image),
             ]);
  
         return Inertia::render('Dashboard/Client/Bookings', [
@@ -173,9 +174,7 @@ public function active()
             'daysLeft'   => max(0, $today->diffInDays($end, false)),
             'total'      => $active->prix_total,
             'progress'   => $progress,
-  'image'           => $active->voiture->image 
-                ? asset('/' . ltrim($active->voiture->image, '/')) 
-                : '/images/default-car.png',  
+  'image'           => ImageUrlResolver::toPublicUrl($active->voiture->image),  
                       ];
     $email = $user->email;
     $client = Client::where('email', $email)->first();
@@ -206,7 +205,7 @@ public function fleet(){
                 'transmission' => $v->transmission,
                 'carburant'    => $v->carburant,
                 'couleur'      => $v->couleur,
-                'image' => $v->image ? asset('/' . ltrim($v->image, '/')) : 'default-car.png',
+                'image' => ImageUrlResolver::toPublicUrl($v->image),
                 'disponible'   => $v->disponible,
                 'city'         => $v->agency?->city,
                 'category'     => $v->category ? ['name' => $v->category->name] : null,

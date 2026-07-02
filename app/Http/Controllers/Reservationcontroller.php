@@ -26,7 +26,7 @@ class ReservationController extends Controller
                 'transmission'   => $voiture->transmission,
                 'carburant'      => $voiture->carburant,
                 'couleur'        => $voiture->couleur,
-                'image' => $voiture->image ? asset('/' . ltrim($voiture->image, '/')) : 'default-car.png',
+                'image' => ImageUrlResolver::toPublicUrl($voiture->image),
                 'disponible'     => $voiture->disponible,
                 'description'    => $voiture->description,
                 'city'           => $voiture->agency?->city,

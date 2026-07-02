@@ -92,12 +92,13 @@
       </main>
     </div>
   </div>
+  <Chatwindow />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-
+import Chatwindow from '@/Components/ChatBot/Chatwindow.vue'
 const props = defineProps({
   title:    { type: String, default: 'Dashboard' },
   subtitle: { type: String, default: ''          },

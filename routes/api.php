@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Auth\AgencyRegisterController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\ClientController as ControllersClientController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 
@@ -59,9 +60,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:client')->group(function () {
         Route::get('/client/dashboard', [ControllersClientController::class, 'index']);
     });
-
+    //chatbot
+    Route::post('/chatbot', [ChatBotController::class, 'chat']);
     // Agency
     Route::middleware('role:agence')->group(function () {
         Route::get('/agence/dashboard', [ControllersAgenceController::class, 'index']);
     });
+
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Voiture;
 use App\Models\Category;
+use App\Support\ImageUrlResolver;
 use Inertia\Inertia;
 
 class FleetController extends Controller
@@ -35,7 +36,7 @@ class FleetController extends Controller
                 'reviews'      => 0,
                 'available'    => (bool) $v->disponible,
                 'ac'           => true,
-                                'image' => $v->image ? asset('/' . ltrim($v->image, '/')) : 'default-car.png',
+                'image'        => ImageUrlResolver::toPublicUrl($v->image),
 
             ]);
 

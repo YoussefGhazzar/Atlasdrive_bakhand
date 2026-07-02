@@ -100,12 +100,13 @@
       </main>
     </div>
   </div>
+  <Chatwindow />
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-
+import Chatwindow from '@/Components/ChatBot/Chatwindow.vue'
 defineProps({
   title:    { type: String, default: 'Dashboard' },
   subtitle: { type: String, default: ''          },
