@@ -439,7 +439,7 @@ function resetFilters() {
   selectedFuels.value         = []
   selectedTransmissions.value = []
   onlyAvailable.value         = false
-  priceRange.value            = [20, 600]
+  priceRange.value            = [100,3000]
   searchQuery.value           = ''
 }
  

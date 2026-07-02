@@ -19,7 +19,7 @@ class ImageUrlResolver
         $normalized = ltrim($path, '/');
 
         if (str_starts_with($normalized, 'storage/')) {
-            $normalized = substr($normalized, strlen('storage/'));
+            return '/' . $normalized;
         }
 
         if (str_starts_with($normalized, 'public/')) {

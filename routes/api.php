@@ -34,7 +34,7 @@ Route::get('/register/agency', [ControllersAgenceController::class, 'index']);
 Route::get('/register/client', [ControllersClientController::class, 'index']);
 Route::get('/register/admin', [ControllersAdminController::class, 'index']);
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/chatbot', [ChatBotController::class, 'chat']);
 
 /*
 |--------------------------------------------------------------------------
@@ -60,11 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:client')->group(function () {
         Route::get('/client/dashboard', [ControllersClientController::class, 'index']);
     });
-    //chatbot
-    Route::post('/chatbot', [ChatBotController::class, 'chat']);
     // Agency
     Route::middleware('role:agence')->group(function () {
         Route::get('/agence/dashboard', [ControllersAgenceController::class, 'index']);
     });
 
 });
+

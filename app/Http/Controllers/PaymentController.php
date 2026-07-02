@@ -28,7 +28,7 @@ class PaymentController extends Controller
         'cvv'          => ['required', 'string'],
     ]);
 
-    $agency = auth()->user()->agency;
+    $agency = auth()->user()->agence;
     $user = auth()->user();
 
     // 1. Calcul dyal l-amount (Price Logic)
@@ -52,7 +52,7 @@ class PaymentController extends Controller
 
     // 3. Update Agency Status
     $agency->update([
-        'status' => 'active',
+        'status' => 'Verified',
         'plan'   => $request->plan // optional: keep current plan in agency table for easy access
     ]);
 

@@ -230,6 +230,12 @@ public function storeFleet(Request $request)
         'disponible'      => ['nullable'],
     ]);
  
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('images', 'public');
+        $imagePath = 'storage/' . $path;
+    }
+
     // Build the insert array explicitly — no $request->except()
     $data = [
         'agency_id'       => auth()->user()->agence->id,
@@ -244,14 +250,9 @@ public function storeFleet(Request $request)
         'carburant'       => $validated['carburant'],
         'couleur'         => $validated['couleur'] ?? null,
         'disponible'      => $request->boolean('disponible'),
+        'image'           => $imagePath,
     ];
  
-   if ($request->hasFile('image')) {
-    $path = $request->file('image')->store('images', 'public');
- 
-    // Prefix with "storage/" before saving to DB
-    $data['image'] = 'storage/' . $path;
-}
  
     Voiture::create($data);
  
@@ -283,9 +284,14 @@ public function updateFleet(Request $request, Voiture $voiture)
  
     if ($request->hasFile('image')) {
         if ($voiture->image) {
-            Storage::disk('public')->delete($voiture->image);
+            $oldPath = $voiture->image;
+            if (str_starts_with($oldPath, 'storage/')) {
+                $oldPath = substr($oldPath, strlen('storage/'));
+            }
+            Storage::disk('public')->delete($oldPath);
         }
-        $data['image'] = $request->file('image')->store('storage/images', 'public');
+        $path = $request->file('image')->store('images', 'public');
+        $data['image'] = 'storage/' . $path;
     }
  
     $voiture->update($data);

@@ -24,8 +24,8 @@ class ChatBotController extends Controller
 
         try {
             // Forward request to Python FastAPI Chatbot Service
-            // Python service is run on port 9000 as configured by the user
-            $chatbotUrl = env('CHATBOT_SERVICE_URL', 'http://127.0.0.1:9000/chat');
+            // Python service is run on port 8001 inside Docker
+            $chatbotUrl = env('CHATBOT_SERVICE_URL', 'http://chatbot:8001/chat');
 
             $response = Http::timeout(30)->post($chatbotUrl, [
                 'message' => $message,

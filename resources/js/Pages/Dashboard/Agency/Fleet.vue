@@ -46,7 +46,7 @@
                 {{ car.category?.name ?? '—' }}
               </span>
             </td>
-            <td class="px-5 py-3 text-sm font-bold text-slate-700">${{ car.prix_par_jour }}</td>
+            <td class="px-5 py-3 text-sm font-bold text-slate-700">{{ car.prix_par_jour }} DH</td>
             <td class="px-5 py-3">
               <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', car.disponible ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-600']">
                 {{ car.disponible ? 'Available' : 'Rented' }}
@@ -139,7 +139,7 @@
             <!-- Price + Seats -->
             <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Price/day ($)</label>
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Price/day (DH)</label>
                 <input v-model="form.prix_par_jour" type="number" min="0" step="0.01" placeholder="180"
                   class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-colors"/>
                 <p v-if="form.errors.prix_par_jour" class="text-xs text-red-500">{{ form.errors.prix_par_jour }}</p>
@@ -148,6 +148,7 @@
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Seats</label>
                 <input v-model="form.nb_places" type="number" min="1" max="9" placeholder="5"
                   class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-colors"/>
+                <p v-if="form.errors.nb_places" class="text-xs text-red-500">{{ form.errors.nb_places }}</p>
               </div>
             </div>
 
@@ -160,6 +161,7 @@
                   <option value="manuelle">Manual</option>
                   <option value="automatique">Automatic</option>
                 </select>
+                <p v-if="form.errors.transmission" class="text-xs text-red-500">{{ form.errors.transmission }}</p>
               </div>
               <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fuel</label>
@@ -170,6 +172,7 @@
                   <option value="electrique">Electric</option>
                   <option value="hybride">Hybrid</option>
                 </select>
+                <p v-if="form.errors.carburant" class="text-xs text-red-500">{{ form.errors.carburant }}</p>
               </div>
             </div>
 

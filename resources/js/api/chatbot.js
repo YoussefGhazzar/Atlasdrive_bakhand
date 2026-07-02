@@ -1,7 +1,8 @@
-const CHATBOT_BASE_URL = import.meta.env.VITE_CHATBOT_URL || 'http://localhost:8001';
+const CHATBOT_BASE_URL = import.meta.env.VITE_CHATBOT_URL || '';
 
 export async function sendMessage(message) {
-  const response = await fetch(`${CHATBOT_BASE_URL}/chat`, {
+  const url = CHATBOT_BASE_URL ? `${CHATBOT_BASE_URL}/chat` : '/api/chatbot';
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
