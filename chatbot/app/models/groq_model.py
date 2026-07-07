@@ -3,14 +3,18 @@ import os
 import json
 from app.prompts.prompts import SYSTEM_PROMPT 
 from app.prompts.prompts import USER_PROMPT_TEMPLATE
+from dotenv import load_dotenv
+
+import os
 from app.models.database import (
     query_available_cars,
     query_agency_details,
     query_reservation_details,
     calculate_booking_price
 )
+load_dotenv()
 
-GROQ_API_KEY = 'REDACTED_GROQ_API_KEY'
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Define tools for database querying
 TOOLS = [
