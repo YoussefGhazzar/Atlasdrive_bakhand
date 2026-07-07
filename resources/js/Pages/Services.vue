@@ -262,12 +262,13 @@
     </footer>
 
   </div>
+  <Footer />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import Navbar from '@/Components/Navbar.vue'
-
+import Footer from '@/Components/Footer.vue'
 const activeStep      = ref(0)
 const bookingCity     = ref('')
 const pickupDate      = ref('')

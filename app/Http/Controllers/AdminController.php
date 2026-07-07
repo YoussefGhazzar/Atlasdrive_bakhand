@@ -25,7 +25,7 @@ class AdminController extends Controller
         $stats = [
             [
                 'label'  => 'Total Revenue',
-                'value'  => '$' . number_format($totalRevenue, 0),
+                'value'  => 'DH' . number_format($totalRevenue, 0),
                 'change' => '+24%',
                 'up'     => true,
                 'color'  => '#0d9488',

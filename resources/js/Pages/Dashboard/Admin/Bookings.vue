@@ -30,7 +30,7 @@
             <td class="px-5 py-3 text-sm text-slate-500">{{ b.agency }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ b.vehicle }}</td>
             <td class="px-5 py-3 text-xs text-slate-500">{{ b.dates }}</td>
-            <td class="px-5 py-3 text-sm font-bold text-slate-800">${{ b.total }}</td>
+            <td class="px-5 py-3 text-sm font-bold text-slate-800">{{ b.total }}DH</td>
             <td class="px-5 py-3">
               <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', statusClass(b.status)]">
                 {{ b.status }}

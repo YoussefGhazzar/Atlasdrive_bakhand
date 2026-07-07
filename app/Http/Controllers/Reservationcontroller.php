@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Voiture;
 use App\Models\Reservation;
+use App\Support\ImageUrlResolver;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;

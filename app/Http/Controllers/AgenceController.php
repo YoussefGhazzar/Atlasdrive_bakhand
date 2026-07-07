@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agence;
 use App\Models\User;
-use App\Models\voiture;
+use App\Models\Voiture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -305,7 +305,11 @@ public function destroyFleet(Voiture $voiture)
     abort_unless($voiture->agency_id === auth()->user()->agence->id, 403);
  
     if ($voiture->image) {
-        Storage::disk('public')->delete($voiture->image);
+        $oldPath = $voiture->image;
+        if (str_starts_with($oldPath, 'storage/')) {
+            $oldPath = substr($oldPath, strlen('storage/'));
+        }
+        Storage::disk('public')->delete($oldPath);
     }
  
     $voiture->delete();

@@ -388,7 +388,7 @@ const selectedCategories    = ref([])
 const selectedFuels         = ref([])
 const selectedTransmissions = ref([])
 const onlyAvailable         = ref(false)
-const priceRange            = ref([20, 600])
+const priceRange            = ref([100, 3000])
 const sortBy                = ref('price-asc')
 const wishlist               = ref([])
  

@@ -51,12 +51,12 @@
         <!-- Price range -->
         <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-4 shadow-sm">
           <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Max Price/day</p>
-          <input v-model="maxPrice" type="range" min="50" max="500" step="10"
+          <input v-model="maxPrice" type="range" min="100" max="3000" step="10"
             class="w-full accent-teal-600"/>
           <div class="flex justify-between text-xs text-slate-500 mt-1">
-            <span>50DH</span>
+            <span>100DH</span>
             <span class="font-bold text-teal-600">{{ maxPrice }}DH</span>
-            <span>500DH</span>
+            <span>3000DH</span>
           </div>
         </div>
 
@@ -213,7 +213,7 @@ const props = defineProps({
 const search              = ref('')
 const selectedCategory    = ref('All')
 const selectedTransmission = ref('All')
-const maxPrice            = ref(500)
+const maxPrice            = ref(3000)
 const sortBy              = ref('price_asc')
 
 const filteredCars = computed(() => {
@@ -243,7 +243,7 @@ function resetFilters() {
   search.value               = ''
   selectedCategory.value     = 'All'
   selectedTransmission.value = 'All'
-  maxPrice.value             = 500
+  maxPrice.value             = 3000
   sortBy.value               = 'price_asc'
 }
 </script>
